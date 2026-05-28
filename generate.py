@@ -147,7 +147,7 @@ for c, d in camps_sorted[:5]:
     funnel_camps_html += f'''
       <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:12px;margin-bottom:8px;">
         <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--purple);text-transform:uppercase;margin-bottom:8px;">{ce}</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center;">
+        <div class="mini-grid">
           <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--yellow);">{d["cart"]}</div><div style="font-size:8px;color:var(--muted);">Cart</div></div>
           <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--yellow);">{d["checkout"]}</div><div style="font-size:8px;color:var(--muted);">Checkout</div></div>
           <div style="background:rgba(110,231,183,0.08);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--green);">{d["compras"]}</div><div style="font-size:8px;color:var(--muted);">Compras</div></div>
@@ -166,7 +166,7 @@ def camp_card(cname, cdata, all_ads):
 
     cadena = cname
     rows_html = ''
-    for n, d in sorted([(n,d) for n,d in all_ads.items() if d['camp']==cadena],
+    for n, d in sorted([(n,d) for n,d in all_ads.items() if d['camp']==cadena and n in ads_activos],
                        key=lambda x: -x[1]['spend']):
         if d['spend'] <= 0: continue
         ar   = d['val']/d['spend'] if d['spend'] else 0
@@ -291,7 +291,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .at td.n{max-width:160px;overflow:hidden;text-overflow:ellipsis;}
 .at td.r{font-family:'DM Mono',monospace;font-size:10.5px;}
 .fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
-@media(max-width:600px){body{padding:20px 16px;}.fn-grid{grid-template-columns:1fr!important;}.mg{grid-template-columns:1fr!important;}.grid{grid-template-columns:1fr!important;}.card{padding:20px;}}
+.mini-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center;}
+@media(max-width:600px){body{padding:20px 16px;}.fn-grid{grid-template-columns:1fr!important;}.mg{grid-template-columns:1fr!important;}.grid{grid-template-columns:1fr!important;}.card{padding:20px;}.mini-grid{grid-template-columns:repeat(2,1fr)!important;}}
 .ta{display:inline-block;background:rgba(239,68,68,0.12);color:#f87171;font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;}
 .wc{margin-bottom:24px;background:linear-gradient(135deg,rgba(252,211,77,0.08),rgba(252,211,77,0.03));border:1px solid rgba(252,211,77,0.25);border-radius:16px;padding:28px;position:relative;overflow:hidden;}
 .wc::before{content:"\\1F3C6";position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:52px;opacity:0.15;}
