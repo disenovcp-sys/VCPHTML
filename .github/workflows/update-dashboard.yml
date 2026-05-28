@@ -1,0 +1,34 @@
+name: VCP Update Dashboard
+
+on:
+  schedule:
+    - cron: '0 13 * * *'   # 10:00 BA
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5.6.0
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Generate Dashboard
+        env:
+          WINDSOR_KEY:     ${{ secrets.WINDSOR_KEY }}
+          META_ACCOUNT:    ${{ secrets.META_ACCOUNT }}
+          SHOPIFY_ACCOUNT: ${{ secrets.SHOPIFY_ACCOUNT }}
+          GOOGLE_ACCOUNT:  ${{ secrets.GOOGLE_ACCOUNT }}
+          TELEGRAM_BOT:    ${{ secrets.TELEGRAM_BOT }}
+          TELEGRAM_CHAT:   ${{ secrets.TELEGRAM_CHAT }}
+        run: python generate.py
+      - name: Commit index.html
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff --staged --quiet || git commit -m "dashboard $(date -u +%Y-%m-%d)"
+          git push
