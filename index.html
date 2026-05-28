@@ -34,12 +34,15 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .rbl{background:rgba(138,180,248,0.07);border:1px solid rgba(138,180,248,0.25);}.rbl .rl,.rbl .rv{color:var(--blue);}
 .sl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
 .div{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .at{width:100%;border-collapse:collapse;font-size:11px;}
 .at th{text-align:left;padding:6px 4px;color:var(--muted);font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:0.08em;text-transform:uppercase;font-weight:400;border-bottom:1px solid var(--border);white-space:nowrap;}
 .at th.r,.at td.r{text-align:right;}
 .at td{padding:8px 4px;border-bottom:1px solid rgba(255,255,255,0.03);white-space:nowrap;}
 .at td.n{max-width:160px;overflow:hidden;text-overflow:ellipsis;}
 .at td.r{font-family:'DM Mono',monospace;font-size:10.5px;}
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+@media(max-width:600px){body{padding:20px 16px;}.fn-grid{grid-template-columns:1fr!important;}.mg{grid-template-columns:1fr!important;}.grid{grid-template-columns:1fr!important;}.card{padding:20px;}}
 .ta{display:inline-block;background:rgba(239,68,68,0.12);color:#f87171;font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;}
 .wc{margin-bottom:24px;background:linear-gradient(135deg,rgba(252,211,77,0.08),rgba(252,211,77,0.03));border:1px solid rgba(252,211,77,0.25);border-radius:16px;padding:28px;position:relative;overflow:hidden;}
 .wc::before{content:"\1F3C6";position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:52px;opacity:0.15;}
@@ -67,25 +70,25 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 </div>
 <div class="wrap">
 
-<!-- HOY -->
+<!-- AYER -->
 <div style="background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(167,139,250,0.02));border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:28px;margin-bottom:24px;position:relative;overflow:hidden;">
   <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),#818cf8,var(--blue));border-radius:16px 16px 0 0;"></div>
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:18px;">
     <div>
-      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📅 Hoy · 28 de Mayo 2026 — Jueves</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:22px;">Meta Ads · <span style="font-style:italic;color:var(--purple);">datos en curso</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📅 Ayer · 27/05/2026</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;">Meta Ads · <span style="font-style:italic;color:var(--purple);">datos completos</span></div>
     </div>
     <div style="text-align:right;">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;">GASTO HOY META</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:44px;color:var(--purple);line-height:1;">$45.209</div>
-      <div style="font-size:11px;color:var(--muted);">3 compras pixel · ROAS 13.6x</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;">GASTO AYER META</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:44px;color:var(--purple);line-height:1;">$395.259</div>
+      <div style="font-size:11px;color:var(--muted);">15 compras pixel · ROAS 6.3x</div>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
-    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">Impresiones</div><div class="kv" style="color:var(--text);font-size:18px;">15,240</div><div class="ks">226 clics</div></div>
-    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">CTR hoy</div><div class="kv" style="color:var(--blue);font-size:18px;">1.5%</div><div class="ks">Meta solamente</div></div>
-    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">Compras pixel</div><div class="kv" style="color:var(--green);font-size:18px;">3</div><div class="ks">ROAS 13.6x</div></div>
-    <div class="kpi" style="border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.04);"><div class="kl">Revenue pixel</div><div class="kv" style="color:var(--purple);font-size:16px;">$613.778</div></div>
+    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">Impresiones</div><div class="kv" style="color:var(--text);font-size:18px;">126,061</div><div class="ks">2,134 clics</div></div>
+    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">CTR ayer</div><div class="kv" style="color:var(--blue);font-size:18px;">1.7%</div><div class="ks">Meta solamente</div></div>
+    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">Compras pixel</div><div class="kv" style="color:var(--green);font-size:18px;">15</div><div class="ks">ROAS 6.3x</div></div>
+    <div class="kpi" style="border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.04);"><div class="kl">Revenue pixel</div><div class="kv" style="color:var(--purple);font-size:16px;">$2.470.702</div></div>
   </div>
 </div>
 
@@ -110,7 +113,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     <div class="kpi" style="background:rgba(110,231,183,0.08);border-color:rgba(110,231,183,0.3);"><div class="kl" style="color:var(--green);">Revenue Shopify</div><div class="kv" style="color:var(--green);">$146.946.804</div><div class="ks">🔥 1127 órdenes</div></div>
   </div>
   <div class="sl">🔻 Funnel del mes (Meta)</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
+  <div class="fn-grid">
     <div>
       <div style="margin-bottom:4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><div style="display:flex;align-items:center;gap:8px;"><span>👁</span><span style="font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--muted);">Impresiones</span></div><span style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--blue);">5,624,179</span></div><div class="fn-bar"><div style="height:100%;width:100%;background:var(--blue);border-radius:3px;"></div></div></div>
       <div style="text-align:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin:3px 0;">▼ 1.7% clicaron</div>
@@ -150,24 +153,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
           <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--yellow);">583</div><div style="font-size:8px;color:var(--muted);">Checkout</div></div>
           <div style="background:rgba(110,231,183,0.08);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--green);">165</div><div style="font-size:8px;color:var(--muted);">Compras</div></div>
           <div style="background:rgba(110,231,183,0.08);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--green);">28.3%</div><div style="font-size:8px;color:var(--muted);">Cierre</div></div>
-        </div>
-      </div>
-      <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:12px;margin-bottom:8px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--purple);text-transform:uppercase;margin-bottom:8px;">01 Ventas - FEED</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center;">
-          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--yellow);">574</div><div style="font-size:8px;color:var(--muted);">Cart</div></div>
-          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--yellow);">289</div><div style="font-size:8px;color:var(--muted);">Checkout</div></div>
-          <div style="background:rgba(110,231,183,0.08);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--green);">101</div><div style="font-size:8px;color:var(--muted);">Compras</div></div>
-          <div style="background:rgba(110,231,183,0.08);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--green);">34.9%</div><div style="font-size:8px;color:var(--muted);">Cierre</div></div>
-        </div>
-      </div>
-      <div style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.2);border-radius:12px;padding:12px;margin-bottom:8px;">
-        <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--purple);text-transform:uppercase;margin-bottom:8px;">02 story - ventas</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px;text-align:center;">
-          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--yellow);">498</div><div style="font-size:8px;color:var(--muted);">Cart</div></div>
-          <div style="background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--yellow);">243</div><div style="font-size:8px;color:var(--muted);">Checkout</div></div>
-          <div style="background:rgba(110,231,183,0.08);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--green);">80</div><div style="font-size:8px;color:var(--muted);">Compras</div></div>
-          <div style="background:rgba(110,231,183,0.08);border-radius:8px;padding:6px 2px;"><div style="font-family:'DM Serif Display',serif;font-size:14px;color:var(--green);">32.9%</div><div style="font-size:8px;color:var(--muted);">Cierre</div></div>
         </div>
       </div>
     </div>
@@ -212,7 +197,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
   </div>
   <div class="div"></div>
   <div class="sl">Anuncios del mes</div>
-  <table class="at">
+  <div class="tbl-wrap"><table class="at">
     <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
     <tbody>
       <tr>
@@ -312,7 +297,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
         <td class="r">1.38</td>
       </tr>
       <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - CRONOS</td>
+        <td class="n" style="color:var(--green);">⬤ Mayo - CRONOS</td>
         <td class="r">$126.644</td>
         <td class="r" style="color:var(--yellow);">2.1%</td>
         <td class="r" style="color:var(--green);">5</td>
@@ -360,7 +345,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
         <td class="r">1.34</td>
       </tr>
     </tbody>
-  </table>
+  </table></div>
 </div>
 
 <div class="card">
@@ -379,7 +364,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
   </div>
   <div class="div"></div>
   <div class="sl">Anuncios del mes</div>
-  <table class="at">
+  <div class="tbl-wrap"><table class="at">
     <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
     <tbody>
       <tr>
@@ -463,7 +448,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
         <td class="r">2.34</td>
       </tr>
     </tbody>
-  </table>
+  </table></div>
 </div>
 
 <div class="card">
@@ -482,7 +467,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
   </div>
   <div class="div"></div>
   <div class="sl">Anuncios del mes</div>
-  <table class="at">
+  <div class="tbl-wrap"><table class="at">
     <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
     <tbody>
       <tr>
@@ -534,7 +519,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
         <td class="r">10.05</td>
       </tr>
       <tr>
-        <td class="n" style="color:var(--green);">⬤ Mayo - Elton</td>
+        <td class="n" style="color:var(--yellow);">⬤ Mayo - Elton</td>
         <td class="r">$23.693</td>
         <td class="r" style="color:var(--yellow);">1.3%</td>
         <td class="r" style="color:var(--green);">2</td>
@@ -558,235 +543,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
         <td class="r">1.09</td>
       </tr>
     </tbody>
-  </table>
-</div>
-
-<div class="card">
-  <div class="card-tag">📊 01 Ventas - FEED</div>
-  <div class="card-title">01 Ventas - FEED</div>
-  <div class="mg">
-    <div class="mt"><div class="ml">Inversión</div><div class="mv">$1.821.877</div><div class="ms">Mayo 2026</div></div>
-    <div class="mt"><div class="ml">Impresiones</div><div class="mv" style="font-size:18px;">362,189</div><div class="ms">CTR 1.6%</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.06);border-color:rgba(167,139,250,0.2);"><div class="ml" style="color:var(--purple);">Compras pixel</div><div class="mv" style="color:var(--purple);font-size:20px;">101</div><div class="ms">CPA $18.038</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.04);border-color:rgba(167,139,250,0.15);"><div class="ml" style="color:var(--purple);">Revenue pixel</div><div class="mv" style="color:var(--purple);font-size:18px;">$13.930.543</div></div>
-  </div>
-  <div class="rb rbl" style="">
-    <div class="rl" style="color:var(--yellow);">ROAS</div>
-    <div class="rv" style="color:var(--yellow);">7.6x</div>
-    <div class="rs">$13.930.543 generados · 101 ventas</div>
-  </div>
-  <div class="div"></div>
-  <div class="sl">Anuncios del mes</div>
-  <table class="at">
-    <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
-    <tbody>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - video 03- Hot Sale - Copia</td>
-        <td class="r">$936.315</td>
-        <td class="r" style="color:var(--yellow);">1.6%</td>
-        <td class="r" style="color:var(--green);">64</td>
-        <td class="r" style="color:var(--green);font-weight:700;">9.8x</td>
-        <td class="r">2.02</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - video 01 - Hot Sale - Copia</td>
-        <td class="r">$350.518</td>
-        <td class="r" style="color:var(--yellow);">1.8%</td>
-        <td class="r" style="color:var(--green);">14</td>
-        <td class="r" style="color:var(--red);font-weight:700;">4.4x</td>
-        <td class="r">1.51</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Sweater 1 - Copia</td>
-        <td class="r">$329.475</td>
-        <td class="r" style="color:var(--yellow);">1.5%</td>
-        <td class="r" style="color:var(--green);">17</td>
-        <td class="r" style="color:var(--yellow);font-weight:700;">7.0x</td>
-        <td class="r">1.85</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Cronos 2 - Copia</td>
-        <td class="r">$126.077</td>
-        <td class="r" style="color:var(--yellow);">1.8%</td>
-        <td class="r" style="color:var(--green);">5</td>
-        <td class="r" style="color:var(--yellow);font-weight:700;">6.4x</td>
-        <td class="r">1.42</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Pantalon precio t</td>
-        <td class="r">$79.492</td>
-        <td class="r" style="color:var(--yellow);">0.9%</td>
-        <td class="r" style="color:var(--green);">1</td>
-        <td class="r" style="color:var(--red);font-weight:700;">0.6x</td>
-        <td class="r">1.27</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="card">
-  <div class="card-tag">📊 02 story - ventas</div>
-  <div class="card-title">02 story - ventas</div>
-  <div class="mg">
-    <div class="mt"><div class="ml">Inversión</div><div class="mv">$1.488.352</div><div class="ms">Mayo 2026</div></div>
-    <div class="mt"><div class="ml">Impresiones</div><div class="mv" style="font-size:18px;">408,676</div><div class="ms">CTR 1.5%</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.06);border-color:rgba(167,139,250,0.2);"><div class="ml" style="color:var(--purple);">Compras pixel</div><div class="mv" style="color:var(--purple);font-size:20px;">80</div><div class="ms">CPA $18.604</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.04);border-color:rgba(167,139,250,0.15);"><div class="ml" style="color:var(--purple);">Revenue pixel</div><div class="mv" style="color:var(--purple);font-size:18px;">$10.593.402</div></div>
-  </div>
-  <div class="rb rbl" style="">
-    <div class="rl" style="color:var(--yellow);">ROAS</div>
-    <div class="rv" style="color:var(--yellow);">7.1x</div>
-    <div class="rs">$10.593.402 generados · 80 ventas</div>
-  </div>
-  <div class="div"></div>
-  <div class="sl">Anuncios del mes</div>
-  <table class="at">
-    <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
-    <tbody>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Cronos 2 - Copia </td>
-        <td class="r">$976.509</td>
-        <td class="r" style="color:var(--yellow);">1.5%</td>
-        <td class="r" style="color:var(--green);">49</td>
-        <td class="r" style="color:var(--yellow);font-weight:700;">6.2x</td>
-        <td class="r">2.32</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Sweater 1 - Copia</td>
-        <td class="r">$224.895</td>
-        <td class="r" style="color:var(--yellow);">1.3%</td>
-        <td class="r" style="color:var(--green);">10</td>
-        <td class="r" style="color:var(--yellow);font-weight:700;">6.2x</td>
-        <td class="r">1.93</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - video 01 - Hot Sale - Copia </td>
-        <td class="r">$127.095</td>
-        <td class="r" style="color:var(--yellow);">2.3%</td>
-        <td class="r" style="color:var(--green);">7</td>
-        <td class="r" style="color:var(--green);font-weight:700;">10.8x</td>
-        <td class="r">1.28</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Pantalon precio t</td>
-        <td class="r">$105.495</td>
-        <td class="r" style="color:var(--yellow);">1.1%</td>
-        <td class="r" style="color:var(--green);">9</td>
-        <td class="r" style="color:var(--green);font-weight:700;">12.2x</td>
-        <td class="r">1.57</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - video 03- Hot Sale - Copia 2</td>
-        <td class="r">$54.357</td>
-        <td class="r" style="color:var(--yellow);">1.9%</td>
-        <td class="r" style="color:var(--green);">5</td>
-        <td class="r" style="color:var(--green);font-weight:700;">8.6x</td>
-        <td class="r">1.29</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="card">
-  <div class="card-tag">📊 Ventas x intereses</div>
-  <div class="card-title">Ventas x intereses</div>
-  <div class="mg">
-    <div class="mt"><div class="ml">Inversión</div><div class="mv">$783.169</div><div class="ms">Mayo 2026</div></div>
-    <div class="mt"><div class="ml">Impresiones</div><div class="mv" style="font-size:18px;">173,139</div><div class="ms">CTR 1.7%</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.06);border-color:rgba(167,139,250,0.2);"><div class="ml" style="color:var(--purple);">Compras pixel</div><div class="mv" style="color:var(--purple);font-size:20px;">39</div><div class="ms">CPA $20.081</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.04);border-color:rgba(167,139,250,0.15);"><div class="ml" style="color:var(--purple);">Revenue pixel</div><div class="mv" style="color:var(--purple);font-size:18px;">$4.975.894</div></div>
-  </div>
-  <div class="rb rbl" style="">
-    <div class="rl" style="color:var(--yellow);">ROAS</div>
-    <div class="rv" style="color:var(--yellow);">6.4x</div>
-    <div class="rs">$4.975.894 generados · 39 ventas</div>
-  </div>
-  <div class="div"></div>
-  <div class="sl">Anuncios del mes</div>
-  <table class="at">
-    <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
-    <tbody>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Cronos 2</td>
-        <td class="r">$411.189</td>
-        <td class="r" style="color:var(--yellow);">2.0%</td>
-        <td class="r" style="color:var(--green);">19</td>
-        <td class="r" style="color:var(--yellow);font-weight:700;">5.8x</td>
-        <td class="r">1.46</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - video 01 - Hot Sale</td>
-        <td class="r">$306.456</td>
-        <td class="r" style="color:var(--yellow);">1.3%</td>
-        <td class="r" style="color:var(--green);">16</td>
-        <td class="r" style="color:var(--yellow);font-weight:700;">6.9x</td>
-        <td class="r">1.64</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Campera Muse</td>
-        <td class="r">$38.754</td>
-        <td class="r" style="color:var(--yellow);">1.4%</td>
-        <td class="r" style="color:var(--green);">3</td>
-        <td class="r" style="color:var(--green);font-weight:700;">11.6x</td>
-        <td class="r">1.19</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - video 03- Hot Sale</td>
-        <td class="r">$13.478</td>
-        <td class="r" style="color:var(--yellow);">2.3%</td>
-        <td class="r" style="color:var(--muted);">—</td>
-        <td class="r" style="color:var(--muted);font-weight:700;"><span class="ta">0v</span></td>
-        <td class="r">1.16</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Mayo - Hot Sale - Pantalon precio t</td>
-        <td class="r">$13.292</td>
-        <td class="r" style="color:var(--yellow);">1.7%</td>
-        <td class="r" style="color:var(--green);">1</td>
-        <td class="r" style="color:var(--red);font-weight:700;">2.7x</td>
-        <td class="r">1.14</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="card">
-  <div class="card-tag">📊 Tráfico a Instagram</div>
-  <div class="card-title">Tráfico a Instagram</div>
-  <div class="mg">
-    <div class="mt"><div class="ml">Inversión</div><div class="mv">$140.668</div><div class="ms">Mayo 2026</div></div>
-    <div class="mt"><div class="ml">Impresiones</div><div class="mv" style="font-size:18px;">118,554</div><div class="ms">CTR 2.8%</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.06);border-color:rgba(167,139,250,0.2);"><div class="ml" style="color:var(--purple);">Compras pixel</div><div class="mv" style="color:var(--purple);font-size:20px;">2</div><div class="ms">CPA $70.334</div></div>
-    <div class="mt" style="background:rgba(167,139,250,0.04);border-color:rgba(167,139,250,0.15);"><div class="ml" style="color:var(--purple);">Revenue pixel</div><div class="mv" style="color:var(--purple);font-size:18px;">$242.959</div></div>
-  </div>
-  <div class="rb " style="background:rgba(248,113,113,0.07);border:1px solid rgba(248,113,113,0.25);">
-    <div class="rl" style="color:var(--red);">ROAS</div>
-    <div class="rv" style="color:var(--red);">1.7x</div>
-    <div class="rs">$242.959 generados · 2 ventas</div>
-  </div>
-  <div class="div"></div>
-  <div class="sl">Anuncios del mes</div>
-  <table class="at">
-    <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
-    <tbody>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Abril - Posteo</td>
-        <td class="r">$92.514</td>
-        <td class="r" style="color:var(--yellow);">2.6%</td>
-        <td class="r" style="color:var(--green);">2</td>
-        <td class="r" style="color:var(--red);font-weight:700;">2.6x</td>
-        <td class="r">1.44</td>
-      </tr>
-      <tr>
-        <td class="n" style="color:var(--yellow);">⬤ Abril - brand</td>
-        <td class="r">$48.154</td>
-        <td class="r" style="color:var(--green);">3.3%</td>
-        <td class="r" style="color:var(--muted);">—</td>
-        <td class="r" style="color:var(--muted);font-weight:700;"><span class="ta">0v</span></td>
-        <td class="r">1.27</td>
-      </tr>
-    </tbody>
-  </table>
+  </table></div>
 </div>
 </div>
 
