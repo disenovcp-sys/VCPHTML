@@ -48,8 +48,8 @@ META_FIELDS = ['campaign_name','ad_name','spend','impressions','clicks','reach',
                'action_values_offsite_conversion_fb_pixel_purchase',
                'actions_add_to_cart','actions_initiate_checkout']
 
-print('Pulling Meta hoy...')
-meta_hoy = w('facebook', META, META_FIELDS, HOY, HOY)
+print('Pulling Meta ayer...')
+meta_hoy = w('facebook', META, META_FIELDS, AYER, AYER)
 print('Pulling Meta mes...')
 meta_mes = w('facebook', META, META_FIELDS, MES_DESDE, MES_HASTA)
 print('Pulling Google mes...')
@@ -111,8 +111,12 @@ for n, d in ads_mes.items():
     camps_mes[c]['cart']    += d['cart']
     camps_mes[c]['checkout']+= d['checkout']
 
-camps_sorted = sorted(camps_mes.items(), key=lambda x: -x[1]['spend'])
-ads_activos  = {n for n, d in ads_hoy.items() if d['spend'] > 0}
+ads_activos       = {n for n, d in ads_hoy.items() if d['spend'] > 0}
+camps_activas_ayer = {d['camp'] for n, d in ads_hoy.items() if d['spend'] > 0}
+camps_sorted = sorted(
+    [(c, d) for c, d in camps_mes.items() if c in camps_activas_ayer],
+    key=lambda x: -x[1]['spend']
+)
 
 ganador = None; ganador_roas = 0
 for n, d in ads_mes.items():
@@ -210,11 +214,11 @@ def camp_card(cname, cdata, all_ads):
   </div>
   <div class="div"></div>
   <div class="sl">Anuncios del mes</div>
-  <table class="at">
+  <div class="tbl-wrap"><table class="at">
     <thead><tr><th>Anuncio</th><th class="r">Gasto</th><th class="r">CTR</th><th class="r">Ventas</th><th class="r">ROAS</th><th class="r">Freq</th></tr></thead>
     <tbody>{rows_html}
     </tbody>
-  </table>
+  </table></div>
 </div>'''
 
 camp_cards_html = '\n'.join(camp_card(c, d, ads_mes) for c, d in camps_sorted if d['spend'] > 0)
@@ -279,12 +283,15 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .rbl{background:rgba(138,180,248,0.07);border:1px solid rgba(138,180,248,0.25);}.rbl .rl,.rbl .rv{color:var(--blue);}
 .sl{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);margin-bottom:12px;}
 .div{border:none;border-top:1px solid var(--border);margin:20px 0;}
+.tbl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
 .at{width:100%;border-collapse:collapse;font-size:11px;}
 .at th{text-align:left;padding:6px 4px;color:var(--muted);font-family:'DM Mono',monospace;font-size:8.5px;letter-spacing:0.08em;text-transform:uppercase;font-weight:400;border-bottom:1px solid var(--border);white-space:nowrap;}
 .at th.r,.at td.r{text-align:right;}
 .at td{padding:8px 4px;border-bottom:1px solid rgba(255,255,255,0.03);white-space:nowrap;}
 .at td.n{max-width:160px;overflow:hidden;text-overflow:ellipsis;}
 .at td.r{font-family:'DM Mono',monospace;font-size:10.5px;}
+.fn-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;}
+@media(max-width:600px){body{padding:20px 16px;}.fn-grid{grid-template-columns:1fr!important;}.mg{grid-template-columns:1fr!important;}.grid{grid-template-columns:1fr!important;}.card{padding:20px;}}
 .ta{display:inline-block;background:rgba(239,68,68,0.12);color:#f87171;font-family:'DM Mono',monospace;font-size:9px;padding:2px 6px;border-radius:4px;}
 .wc{margin-bottom:24px;background:linear-gradient(135deg,rgba(252,211,77,0.08),rgba(252,211,77,0.03));border:1px solid rgba(252,211,77,0.25);border-radius:16px;padding:28px;position:relative;overflow:hidden;}
 .wc::before{content:"\\1F3C6";position:absolute;right:28px;top:50%;transform:translateY(-50%);font-size:52px;opacity:0.15;}
@@ -312,23 +319,23 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 </div>
 <div class="wrap">
 
-<!-- HOY -->
+<!-- AYER -->
 <div style="background:linear-gradient(135deg,rgba(167,139,250,0.08),rgba(167,139,250,0.02));border:1px solid rgba(167,139,250,0.3);border-radius:16px;padding:28px;margin-bottom:24px;position:relative;overflow:hidden;">
   <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--purple),#818cf8,var(--blue));border-radius:16px 16px 0 0;"></div>
   <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:16px;margin-bottom:18px;">
     <div>
-      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📅 Hoy · ''' + fecha_hoy + ' — ' + dia_sem + '''</div>
-      <div style="font-family:'DM Serif Display',serif;font-size:22px;">Meta Ads · <span style="font-style:italic;color:var(--purple);">datos en curso</span></div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--purple);margin-bottom:8px;">📅 Ayer · ''' + AYER.strftime('%d/%m/%Y') + '''</div>
+      <div style="font-family:'DM Serif Display',serif;font-size:22px;">Meta Ads · <span style="font-style:italic;color:var(--purple);">datos completos</span></div>
     </div>
     <div style="text-align:right;">
-      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;">GASTO HOY META</div>
+      <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:4px;">GASTO AYER META</div>
       <div style="font-family:'DM Serif Display',serif;font-size:44px;color:var(--purple);line-height:1;">''' + fmt(hoy_meta) + '''</div>
       <div style="font-size:11px;color:var(--muted);">''' + str(hoy_comp) + ' compras pixel · ROAS ' + f'{hoy_roas:.1f}x' + '''</div>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;">
     <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">Impresiones</div><div class="kv" style="color:var(--text);font-size:18px;">''' + f'{hoy_imp:,}' + '''</div><div class="ks">''' + f'{hoy_clk:,}' + ''' clics</div></div>
-    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">CTR hoy</div><div class="kv" style="color:var(--blue);font-size:18px;">''' + pct(hoy_clk,hoy_imp) + '''</div><div class="ks">Meta solamente</div></div>
+    <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">CTR ayer</div><div class="kv" style="color:var(--blue);font-size:18px;">''' + pct(hoy_clk,hoy_imp) + '''</div><div class="ks">Meta solamente</div></div>
     <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">Compras pixel</div><div class="kv" style="color:var(--green);font-size:18px;">''' + str(hoy_comp) + '''</div><div class="ks">ROAS ''' + f'{hoy_roas:.1f}x' + '''</div></div>
     <div class="kpi" style="border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.04);"><div class="kl">Revenue pixel</div><div class="kv" style="color:var(--purple);font-size:16px;">''' + fmt(hoy_val) + '''</div></div>
   </div>
@@ -355,7 +362,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     <div class="kpi" style="background:rgba(110,231,183,0.08);border-color:rgba(110,231,183,0.3);"><div class="kl" style="color:var(--green);">Revenue Shopify</div><div class="kv" style="color:var(--green);">''' + fmt(mes_shop_rev) + '''</div><div class="ks">🔥 ''' + str(mes_shop_orders) + ''' órdenes</div></div>
   </div>
   <div class="sl">🔻 Funnel del mes (Meta)</div>
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:start;">
+  <div class="fn-grid">
     <div>
       <div style="margin-bottom:4px;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><div style="display:flex;align-items:center;gap:8px;"><span>👁</span><span style="font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--muted);">Impresiones</span></div><span style="font-family:'DM Serif Display',serif;font-size:20px;color:var(--blue);">''' + f'{mes_imp:,}' + '''</span></div><div class="fn-bar"><div style="height:100%;width:100%;background:var(--blue);border-radius:3px;"></div></div></div>
       <div style="text-align:center;font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);margin:3px 0;">▼ ''' + pct(mes_clks,mes_imp) + ''' clicaron</div>
