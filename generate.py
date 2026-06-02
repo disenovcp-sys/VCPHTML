@@ -19,6 +19,9 @@ HOY       = NOW.date()
 AYER      = HOY - timedelta(days=1)
 MES_DESDE = date(HOY.year, HOY.month, 1)
 MES_HASTA = AYER
+if MES_DESDE > MES_HASTA:          # primer día del mes: usar mes anterior completo
+    MES_HASTA = MES_DESDE - timedelta(days=1)
+    MES_DESDE = date(MES_HASTA.year, MES_HASTA.month, 1)
 
 MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
          'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
