@@ -400,17 +400,3 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(HTML)
 print('index.html generado OK')
-
-PAGES_URL = 'https://disenovcp-sys.github.io/VCPHTML/'
-msg = (
-    f'\U0001f4ca *VCP — Dashboard actualizado*\n\n'
-    f'_{fecha_hoy}_\n\n'
-    f'\U0001f4b8 Invertido mes: {fmt(mes_inv)}\n'
-    f'\U0001f6d2 Revenue Shopify: {fmt(mes_shop_rev)}\n'
-    f'\U0001f4c8 ROAS: {mes_roas:.1f}x\n\n'
-    f'\U0001f449 [Ver dashboard]({PAGES_URL})'
-)
-resp = requests.post(f'https://api.telegram.org/bot{BOT}/sendMessage',
-    json={'chat_id': CHAT, 'text': msg, 'parse_mode': 'Markdown'}, timeout=15)
-resp.raise_for_status()
-print('Telegram OK:', resp.json()['result']['message_id'])
