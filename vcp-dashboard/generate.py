@@ -88,12 +88,12 @@ try:
     shopify_raw = get_data(
         connector="shopify",
         account=SHOPIFY_ACCOUNT,
-        fields=["date", "order_count", "order_total_price", "order_gross_sales"],
+        fields=["date", "order_count", "order_total_price", "order_gross_sales", "order_financial_status"],
         date_from=ayer,
         date_to=ayer,
     )
-    shopify_ventas = sum(float(r.get("order_total_price", 0) or 0) for r in shopify_raw)
-    shopify_ordenes = sum(int(r.get("order_count", 0) or 0) for r in shopify_raw)
+    shopify_ventas  = sum(float(r.get("order_total_price", 0) or 0) for r in shopify_raw if r.get("order_financial_status") == "PAID")
+    shopify_ordenes = sum(int(r.get("order_count", 0) or 0)         for r in shopify_raw if r.get("order_financial_status") == "PAID")
 except Exception as e:
     print(f"Error Shopify: {e}")
     shopify_ventas  = 0
