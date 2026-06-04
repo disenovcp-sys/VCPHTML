@@ -92,8 +92,8 @@ try:
         date_from=ayer,
         date_to=ayer,
     )
-    shopify_ventas  = sum(float(r.get("order_total_price", 0) or 0) for r in shopify_raw if r.get("order_financial_status") == "PAID")
-    shopify_ordenes = sum(int(r.get("order_count", 0) or 0)         for r in shopify_raw if r.get("order_financial_status") == "PAID")
+    shopify_ventas  = sum(float(r.get("order_total_price", 0) or 0) for r in shopify_raw if r.get("order_financial_status") in ("PAID", "PENDING"))
+    shopify_ordenes = sum(int(r.get("order_count", 0) or 0)         for r in shopify_raw if r.get("order_financial_status") in ("PAID", "PENDING"))
 except Exception as e:
     print(f"Error Shopify: {e}")
     shopify_ventas  = 0
