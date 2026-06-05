@@ -1,6 +1,6 @@
 import os, requests, time, html as H
 from datetime import timezone, timedelta, datetime, date
-from collections import defaultdict
+from collections import defaultdict, Counter
 import calendar
 
 def w_get(url, params, retries=5):
@@ -49,14 +49,14 @@ def w(conn, acct, fields, d1, d2, extra=None):
     fil  = [x for x in rows if str(x.get('account_id', acct)) == str(acct)]
     return fil if fil else rows
 
-def shopify_orders(date_min, date_max):
+def shopify_orders(date_min, date_max, fields="id,total_price,financial_status"):
     url  = f"https://{SHOPIFY_STORE}/admin/api/2026-04/orders.json"
     hdrs = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
     prms = {
         "created_at_min": f"{date_min}T00:00:00-03:00",
         "created_at_max": f"{date_max}T23:59:59-03:00",
         "status": "any", "limit": 250,
-        "fields": "id,total_price,financial_status",
+        "fields": fields,
     }
     out = []
     while url:
@@ -69,6 +69,63 @@ def shopify_orders(date_min, date_max):
             if 'rel="next"' in part:
                 url = part.split(";")[0].strip().strip("<>")
     return [o for o in out if o.get("financial_status") in ("paid", "pending", "partially_paid")]
+
+def get_stock(umbral=3):
+    url  = f"https://{SHOPIFY_STORE}/admin/api/2026-04/products.json"
+    hdrs = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
+    prms = {"limit": 250, "fields": "id,title,variants,status"}
+    critico = []
+    while url:
+        r = requests.get(url, headers=hdrs, params=prms, timeout=30)
+        r.raise_for_status()
+        for p in r.json().get("products", []):
+            if p.get("status") != "active": continue
+            for v in p.get("variants", []):
+                qty  = int(v.get("inventory_quantity") or 0)
+                sku  = v.get("title", "")
+                name = f"{p['title']} / {sku}" if sku and sku != "Default Title" else p["title"]
+                if qty <= umbral:
+                    critico.append((name, qty))
+        lnk = r.headers.get("Link", "")
+        url, prms = None, None
+        for part in lnk.split(","):
+            if 'rel="next"' in part:
+                url = part.split(";")[0].strip().strip("<>")
+    return sorted(critico, key=lambda x: x[1])
+
+def _nth_weekday(year, month, n, weekday):
+    first = date(year, month, 1)
+    delta = (weekday - first.weekday()) % 7
+    d     = first + timedelta(days=delta + (n - 1) * 7)
+    return d if d.month == month else None
+
+_FECHAS_FIJAS = [
+    ((2, 14),  "💕 Enamorados"),
+    ((7, 20),  "🤝 Día del Amigo"),
+    ((9, 21),  "🎓 Día del Estudiante"),
+    ((10, 31), "🎃 Halloween"),
+    ((12, 25), "🎄 Navidad"),
+]
+
+def fechas_proximas(days=45):
+    eventos = []
+    for year in [HOY.year, HOY.year + 1]:
+        for (m, d_), name in _FECHAS_FIJAS:
+            try: eventos.append((date(year, m, d_), name))
+            except ValueError: pass
+        for month, n, name in [
+            (6,  3, "👨 Día del Padre"),
+            (8,  3, "🧒 Día del Niño"),
+            (10, 3, "👩 Día de la Madre"),
+        ]:
+            d_ = _nth_weekday(year, month, n, 6)
+            if d_: eventos.append((d_, name))
+        cyber = _nth_weekday(year, 11, 1, 0)
+        if cyber: eventos.append((cyber, "💻 CyberMonday"))
+    return sorted(
+        [(d_, n) for d_, n in eventos if 0 < (d_ - HOY).days <= days],
+        key=lambda x: x[0]
+    )[:5]
 
 META_FIELDS = ['campaign_name','ad_name','spend','impressions','clicks','reach',
                'frequency','actions_offsite_conversion_fb_pixel_purchase',
@@ -83,7 +140,7 @@ print('Pulling Google mes...')
 goog_mes = w('google_ads', GOOG, ['spend'], MES_DESDE, MES_HASTA)
 print('Pulling Shopify mes y ayer...')
 orders_mes  = shopify_orders(MES_DESDE, MES_HASTA)
-orders_ayer = shopify_orders(AYER, AYER)
+orders_ayer = shopify_orders(AYER, AYER, fields="id,total_price,financial_status,line_items")
 
 def agg(rows):
     ads = defaultdict(lambda: {'camp':'','spend':0.,'imp':0,'clicks':0,'reach':0,
@@ -127,6 +184,16 @@ ayer_shop_rev   = sum(float(o.get('total_price', 0) or 0) for o in orders_ayer)
 ayer_shop_orders= len(orders_ayer)
 ayer_roas_real  = ayer_shop_rev / hoy_meta if hoy_meta else 0
 ayer_ticket     = ayer_shop_rev / ayer_shop_orders if ayer_shop_orders else 0
+
+prod_cnt = Counter()
+for _o in orders_ayer:
+    for _item in _o.get("line_items", []):
+        _t   = _item.get("title", "")
+        _var = _item.get("variant_title", "")
+        _qty = int(_item.get("quantity", 0) or 0)
+        _k   = f"{_t} / {_var}" if _var and _var != "Default Title" else _t
+        if _t: prod_cnt[_k] += _qty
+top_prods_ayer = prod_cnt.most_common(5)
 mes_inv  = mes_meta + mes_goog
 mes_roas = mes_shop_rev / mes_inv if mes_inv else 0
 
@@ -440,6 +507,32 @@ def fmt_k(n):
     if n >= 1_000:     return f"${n/1_000:.0f}K"
     return f"${n:,.0f}"
 
+# Productos más vendidos
+prods_txt = "\n".join(
+    f"  • {n[:38]} ({q} ud{'s' if q > 1 else ''})"
+    for n, q in top_prods_ayer
+) or "  Sin datos"
+
+# Stock crítico
+print('Consultando stock...')
+try:
+    stock_crit = get_stock(umbral=3)
+except Exception as _e:
+    print(f"Stock error: {_e}")
+    stock_crit = []
+
+stock_txt = (
+    "\n".join(f"  🔴 {n[:35]}: {q} ud{'s' if q > 1 else ''}" for n, q in stock_crit[:6])
+    if stock_crit else "  ✅ Sin alertas"
+)
+
+# Fechas de marketing
+fechas = fechas_proximas()
+fechas_txt = "\n".join(
+    f"  {d_.strftime('%d/%m')} — {n} ({(d_ - HOY).days}d)"
+    for d_, n in fechas
+) or "  Sin fechas próximas"
+
 roas_emoji = "✅" if ayer_roas_real >= 8 else ("⚠️" if ayer_roas_real >= 5 else "🔴")
 roas_label = "Sobre objetivo" if ayer_roas_real >= 8 else ("Bajo objetivo" if ayer_roas_real >= 5 else "Crítico")
 
@@ -447,14 +540,20 @@ tg_msg = f"""📊 *VCP Dashboard — {AYER.strftime('%d/%m/%Y')}*
 
 💰 Inversión Meta: {fmt_k(hoy_meta)}
 🛍 Ventas Shopify: {fmt_k(ayer_shop_rev)}
-🎯 ROAS real: {ayer_roas_real:.1f}x {roas_emoji} ({roas_label})
-📦 Órdenes: {ayer_shop_orders}
-🎫 Ticket promedio: {fmt_k(ayer_ticket)}
+🎯 ROAS: {ayer_roas_real:.1f}x {roas_emoji} ({roas_label})
+📦 Órdenes: {ayer_shop_orders} · 🎫 Ticket: {fmt_k(ayer_ticket)}
 
 📈 *{mes_label} acumulado:*
-• Inversión: {fmt_k(mes_inv)} (Meta + Google)
-• Revenue Shopify: {fmt_k(mes_shop_rev)}
-• ROAS: {mes_roas:.1f}x · Órdenes: {mes_shop_orders}
+• Inv: {fmt_k(mes_inv)} · Rev: {fmt_k(mes_shop_rev)} · ROAS: {mes_roas:.1f}x
+
+🛍 *Más vendidos ayer:*
+{prods_txt}
+
+📦 *Stock crítico (≤3 uds):*
+{stock_txt}
+
+📅 *Fechas clave:*
+{fechas_txt}
 
 🔗 [Ver dashboard]({PAGES_URL})"""
 
