@@ -93,6 +93,20 @@ def get_stock(umbral=3):
                 url = part.split(";")[0].strip().strip("<>")
     return sorted(critico, key=lambda x: x[1])
 
+def _easter(year):
+    a = year % 19
+    b, c = divmod(year, 100)
+    d, e = divmod(b, 4)
+    f = (b + 8) // 25
+    g = (b - f + 1) // 3
+    h = (19*a + b - d - g + 15) % 30
+    i, k = divmod(c, 4)
+    l = (32 + 2*e + 2*i - h - k) % 7
+    m = (a + 11*h + 22*l) // 451
+    mo = (h + l - 7*m + 114) // 31
+    dy = ((h + l - 7*m + 114) % 31) + 1
+    return date(year, mo, dy)
+
 def _nth_weekday(year, month, n, weekday):
     first = date(year, month, 1)
     delta = (weekday - first.weekday()) % 7
@@ -100,28 +114,71 @@ def _nth_weekday(year, month, n, weekday):
     return d if d.month == month else None
 
 _FECHAS_FIJAS = [
-    ((2, 14),  "💕 Enamorados"),
+    ((1,  1),  "🎆 Año Nuevo"),
+    ((1,  6),  "🎁 Reyes Magos"),
+    ((2,  9),  "🍕 Día de la Pizza"),
+    ((2, 14),  "💕 San Valentín"),
+    ((3,  8),  "♀ Día de la Mujer"),
+    ((3, 17),  "🍀 San Patricio"),
+    ((4,  2),  "🇦🇷 Día de Malvinas"),
+    ((5,  1),  "👷 Día del Trabajador"),
+    ((5,  4),  "⭐ Star Wars Day"),
+    ((5, 25),  "🇦🇷 Revolución de Mayo"),
+    ((5, 28),  "🍔 Día de la Hamburguesa"),
+    ((6,  1),  "💰 Aguinaldo Junio"),
+    ((6, 20),  "🇦🇷 Día de la Bandera"),
+    ((6, 21),  "❄️ Inicio del Invierno"),
+    ((7,  9),  "🇦🇷 Día de la Independencia"),
+    ((7, 14),  "🏖 Vacaciones de Invierno"),
     ((7, 20),  "🤝 Día del Amigo"),
-    ((9, 21),  "🎓 Día del Estudiante"),
-    ((10, 31), "🎃 Halloween"),
-    ((12, 25), "🎄 Navidad"),
+    ((8, 17),  "🏅 Día de San Martín"),
+    ((9, 21),  "🌸 Primavera / Día del Estudiante"),
+    ((10,11),  "🍮 Día del Dulce de Leche"),
+    ((10,31),  "🎃 Halloween"),
+    ((11,20),  "🇦🇷 Día de la Soberanía"),
+    ((11,30),  "🧉 Día del Mate"),
+    ((12, 8),  "✨ Inmaculada Concepción"),
+    ((12,15),  "💰 Aguinaldo Diciembre"),
+    ((12,24),  "🎄 Nochebuena"),
+    ((12,25),  "🎄 Navidad"),
+    ((12,31),  "🎆 Fin de Año"),
 ]
 
-def fechas_proximas(days=45):
+_HOT_SALE = {
+    2026: date(2026, 5, 18),
+    2027: date(2027, 5, 17),
+}
+
+def fechas_proximas(days=60):
     eventos = []
     for year in [HOY.year, HOY.year + 1]:
         for (m, d_), name in _FECHAS_FIJAS:
             try: eventos.append((date(year, m, d_), name))
             except ValueError: pass
+        # Pascuas y Carnaval
+        p = _easter(year)
+        eventos += [
+            (p,                          "✝️ Pascuas"),
+            (p - timedelta(days=7),      "✝️ Semana Santa"),
+            (p - timedelta(days=47),     "🎉 Carnaval"),
+        ]
+        # Domingos variables
         for month, n, name in [
             (6,  3, "👨 Día del Padre"),
-            (8,  3, "🧒 Día del Niño"),
+            (8,  3, "🧒 Día de las Infancias"),
             (10, 3, "👩 Día de la Madre"),
         ]:
             d_ = _nth_weekday(year, month, n, 6)
             if d_: eventos.append((d_, name))
+        # CyberMonday: primer lunes de noviembre
         cyber = _nth_weekday(year, 11, 1, 0)
         if cyber: eventos.append((cyber, "💻 CyberMonday"))
+        # Black Friday: cuarto viernes de noviembre
+        bf = _nth_weekday(year, 11, 4, 4)
+        if bf: eventos.append((bf, "🖤 Black Friday"))
+    # Hot Sale (fecha fija por año)
+    for hs in _HOT_SALE.values():
+        eventos.append((hs, "🔥 Hot Sale"))
     return sorted(
         [(d_, n) for d_, n in eventos if 0 < (d_ - HOY).days <= days],
         key=lambda x: x[0]
