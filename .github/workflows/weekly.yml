@@ -1,0 +1,26 @@
+name: VCP Weekly Summary
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'   # Lunes 10:00 BA (UTC-3)
+  workflow_dispatch:
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4.2.2
+      - uses: actions/setup-python@v5.6.0
+        with:
+          python-version: '3.11'
+      - run: pip install requests
+      - name: Weekly Summary
+        env:
+          WINDSOR_KEY:   ${{ secrets.WINDSOR_KEY }}
+          META_ACCOUNT:  ${{ secrets.META_ACCOUNT }}
+          SHOPIFY_STORE: ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_TOKEN: ${{ secrets.SHOPIFY_TOKEN }}
+          TELEGRAM_BOT:  ${{ secrets.TELEGRAM_BOT }}
+          TELEGRAM_CHAT: ${{ secrets.TELEGRAM_CHAT }}
+          PAGES_URL:     https://disenovcp-sys.github.io/vcp-dashboard
+        run: python weekly_summary.py

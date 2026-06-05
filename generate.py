@@ -31,8 +31,11 @@ K    = os.environ['WINDSOR_KEY']
 META = os.environ['META_ACCOUNT']
 SHOP = os.environ['SHOPIFY_ACCOUNT']
 GOOG = os.environ['GOOGLE_ACCOUNT']
-BOT  = os.environ['TELEGRAM_BOT']
-CHAT = os.environ['TELEGRAM_CHAT']
+BOT           = os.environ['TELEGRAM_BOT']
+CHAT          = os.environ['TELEGRAM_CHAT']
+SHOPIFY_STORE = os.environ['SHOPIFY_STORE']
+SHOPIFY_TOKEN = os.environ['SHOPIFY_TOKEN']
+PAGES_URL     = os.environ.get('PAGES_URL', 'https://disenovcp-sys.github.io/vcp-dashboard')
 
 def w(conn, acct, fields, d1, d2, extra=None):
     p = {'api_key': K, 'account_id': acct,
@@ -46,6 +49,27 @@ def w(conn, acct, fields, d1, d2, extra=None):
     fil  = [x for x in rows if str(x.get('account_id', acct)) == str(acct)]
     return fil if fil else rows
 
+def shopify_orders(date_min, date_max):
+    url  = f"https://{SHOPIFY_STORE}/admin/api/2026-04/orders.json"
+    hdrs = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
+    prms = {
+        "created_at_min": f"{date_min}T00:00:00-03:00",
+        "created_at_max": f"{date_max}T23:59:59-03:00",
+        "status": "any", "limit": 250,
+        "fields": "id,total_price,financial_status",
+    }
+    out = []
+    while url:
+        r = requests.get(url, headers=hdrs, params=prms, timeout=30)
+        r.raise_for_status()
+        out.extend(r.json().get("orders", []))
+        lnk = r.headers.get("Link", "")
+        url, prms = None, None
+        for part in lnk.split(","):
+            if 'rel="next"' in part:
+                url = part.split(";")[0].strip().strip("<>")
+    return [o for o in out if o.get("financial_status") in ("paid", "pending", "partially_paid")]
+
 META_FIELDS = ['campaign_name','ad_name','spend','impressions','clicks','reach',
                'frequency','actions_offsite_conversion_fb_pixel_purchase',
                'action_values_offsite_conversion_fb_pixel_purchase',
@@ -57,9 +81,9 @@ print('Pulling Meta mes...')
 meta_mes = w('facebook', META, META_FIELDS, MES_DESDE, MES_HASTA)
 print('Pulling Google mes...')
 goog_mes = w('google_ads', GOOG, ['spend'], MES_DESDE, MES_HASTA)
-print('Pulling Shopify mes...')
-shop_mes = w('shopify', SHOP, ['order_count','order_total_price'],
-             MES_DESDE, MES_HASTA, {'date_filters': '{"orders":"createdAt"}'})
+print('Pulling Shopify mes y ayer...')
+orders_mes  = shopify_orders(MES_DESDE, MES_HASTA)
+orders_ayer = shopify_orders(AYER, AYER)
 
 def agg(rows):
     ads = defaultdict(lambda: {'camp':'','spend':0.,'imp':0,'clicks':0,'reach':0,
@@ -97,8 +121,12 @@ mes_chk  = sum(a['checkout'] for a in ads_mes.values())
 mes_comp = sum(a['compras'] for a in ads_mes.values())
 mes_val  = sum(a['val']     for a in ads_mes.values())
 mes_goog = sum(float(r.get('spend',0) or 0) for r in goog_mes)
-mes_shop_rev    = sum(float(r.get('order_total_price',0) or 0) for r in shop_mes)
-mes_shop_orders = sum(int(r.get('order_count',0) or 0)         for r in shop_mes)
+mes_shop_rev    = sum(float(o.get('total_price', 0) or 0) for o in orders_mes)
+mes_shop_orders = len(orders_mes)
+ayer_shop_rev   = sum(float(o.get('total_price', 0) or 0) for o in orders_ayer)
+ayer_shop_orders= len(orders_ayer)
+ayer_roas_real  = ayer_shop_rev / hoy_meta if hoy_meta else 0
+ayer_ticket     = ayer_shop_rev / ayer_shop_orders if ayer_shop_orders else 0
 mes_inv  = mes_meta + mes_goog
 mes_roas = mes_shop_rev / mes_inv if mes_inv else 0
 
@@ -342,6 +370,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
     <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">CTR ayer</div><div class="kv" style="color:var(--blue);font-size:18px;">''' + pct(hoy_clk,hoy_imp) + '''</div><div class="ks">Meta solamente</div></div>
     <div class="kpi" style="border-color:rgba(167,139,250,0.2);"><div class="kl">Compras pixel</div><div class="kv" style="color:var(--green);font-size:18px;">''' + str(hoy_comp) + '''</div><div class="ks">ROAS ''' + f'{hoy_roas:.1f}x' + '''</div></div>
     <div class="kpi" style="border-color:rgba(167,139,250,0.2);background:rgba(167,139,250,0.04);"><div class="kl">Revenue pixel</div><div class="kv" style="color:var(--purple);font-size:16px;">''' + fmt(hoy_val) + '''</div></div>
+    <div class="kpi" style="border-color:rgba(110,231,183,0.35);background:rgba(110,231,183,0.06);"><div class="kl">Ventas Shopify</div><div class="kv" style="color:var(--green);font-size:16px;">''' + fmt(ayer_shop_rev) + '''</div><div class="ks">''' + str(ayer_shop_orders) + ''' órdenes · tkт ''' + fmt(ayer_ticket) + '''</div></div>
+    <div class="kpi" style="border-color:rgba(110,231,183,0.35);"><div class="kl">ROAS Real</div><div class="kv" style="color:''' + rcol(ayer_roas_real) + ''';font-size:22px;">''' + f'{ayer_roas_real:.1f}x' + '''</div><div class="ks">Shopify ÷ Meta</div></div>
   </div>
 </div>
 
@@ -403,3 +433,41 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(HTML)
 print('index.html generado OK')
+
+# ─── Telegram ────────────────────────────────────────────────────────────────
+def fmt_k(n):
+    if n >= 1_000_000: return f"${n/1_000_000:.1f}M"
+    if n >= 1_000:     return f"${n/1_000:.0f}K"
+    return f"${n:,.0f}"
+
+roas_emoji = "✅" if ayer_roas_real >= 8 else ("⚠️" if ayer_roas_real >= 5 else "🔴")
+roas_label = "Sobre objetivo" if ayer_roas_real >= 8 else ("Bajo objetivo" if ayer_roas_real >= 5 else "Crítico")
+
+tg_msg = f"""📊 *VCP Dashboard — {AYER.strftime('%d/%m/%Y')}*
+
+💰 Inversión Meta: {fmt_k(hoy_meta)}
+🛍 Ventas Shopify: {fmt_k(ayer_shop_rev)}
+🎯 ROAS real: {ayer_roas_real:.1f}x {roas_emoji} ({roas_label})
+📦 Órdenes: {ayer_shop_orders}
+🎫 Ticket promedio: {fmt_k(ayer_ticket)}
+
+📈 *{mes_label} acumulado:*
+• Inversión: {fmt_k(mes_inv)} (Meta + Google)
+• Revenue Shopify: {fmt_k(mes_shop_rev)}
+• ROAS: {mes_roas:.1f}x · Órdenes: {mes_shop_orders}
+
+🔗 [Ver dashboard]({PAGES_URL})"""
+
+try:
+    resp = requests.post(
+        f"https://api.telegram.org/bot{BOT}/sendMessage",
+        json={"chat_id": CHAT, "text": tg_msg, "parse_mode": "Markdown",
+              "disable_web_page_preview": False},
+        timeout=10,
+    )
+    if resp.ok:
+        print("✅ Telegram enviado")
+    else:
+        print(f"❌ Telegram error: {resp.text}")
+except Exception as e:
+    print(f"❌ Telegram exception: {e}")

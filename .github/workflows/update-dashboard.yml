@@ -21,9 +21,12 @@ jobs:
           WINDSOR_KEY:     ${{ secrets.WINDSOR_KEY }}
           META_ACCOUNT:    ${{ secrets.META_ACCOUNT }}
           SHOPIFY_ACCOUNT: ${{ secrets.SHOPIFY_ACCOUNT }}
+          SHOPIFY_STORE:   ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_TOKEN:   ${{ secrets.SHOPIFY_TOKEN }}
           GOOGLE_ACCOUNT:  ${{ secrets.GOOGLE_ACCOUNT }}
           TELEGRAM_BOT:    ${{ secrets.TELEGRAM_BOT }}
           TELEGRAM_CHAT:   ${{ secrets.TELEGRAM_CHAT }}
+          PAGES_URL:       https://disenovcp-sys.github.io/vcp-dashboard
         run: python generate.py
       - name: Commit index.html
         run: |
