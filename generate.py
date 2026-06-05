@@ -70,120 +70,6 @@ def shopify_orders(date_min, date_max, fields="id,total_price,financial_status")
                 url = part.split(";")[0].strip().strip("<>")
     return [o for o in out if o.get("financial_status") in ("paid", "pending", "partially_paid")]
 
-def get_stock(umbral=3):
-    url  = f"https://{SHOPIFY_STORE}/admin/api/2026-04/products.json"
-    hdrs = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
-    prms = {"limit": 250, "fields": "id,title,variants,status"}
-    critico = []
-    while url:
-        r = requests.get(url, headers=hdrs, params=prms, timeout=30)
-        r.raise_for_status()
-        for p in r.json().get("products", []):
-            if p.get("status") != "active": continue
-            for v in p.get("variants", []):
-                qty  = int(v.get("inventory_quantity") or 0)
-                sku  = v.get("title", "")
-                name = f"{p['title']} / {sku}" if sku and sku != "Default Title" else p["title"]
-                if qty <= umbral:
-                    critico.append((name, qty))
-        lnk = r.headers.get("Link", "")
-        url, prms = None, None
-        for part in lnk.split(","):
-            if 'rel="next"' in part:
-                url = part.split(";")[0].strip().strip("<>")
-    return sorted(critico, key=lambda x: x[1])
-
-def _easter(year):
-    a = year % 19
-    b, c = divmod(year, 100)
-    d, e = divmod(b, 4)
-    f = (b + 8) // 25
-    g = (b - f + 1) // 3
-    h = (19*a + b - d - g + 15) % 30
-    i, k = divmod(c, 4)
-    l = (32 + 2*e + 2*i - h - k) % 7
-    m = (a + 11*h + 22*l) // 451
-    mo = (h + l - 7*m + 114) // 31
-    dy = ((h + l - 7*m + 114) % 31) + 1
-    return date(year, mo, dy)
-
-def _nth_weekday(year, month, n, weekday):
-    first = date(year, month, 1)
-    delta = (weekday - first.weekday()) % 7
-    d     = first + timedelta(days=delta + (n - 1) * 7)
-    return d if d.month == month else None
-
-_FECHAS_FIJAS = [
-    ((1,  1),  "🎆 Año Nuevo"),
-    ((1,  6),  "🎁 Reyes Magos"),
-    ((2,  9),  "🍕 Día de la Pizza"),
-    ((2, 14),  "💕 San Valentín"),
-    ((3,  8),  "♀ Día de la Mujer"),
-    ((3, 17),  "🍀 San Patricio"),
-    ((4,  2),  "🇦🇷 Día de Malvinas"),
-    ((5,  1),  "👷 Día del Trabajador"),
-    ((5,  4),  "⭐ Star Wars Day"),
-    ((5, 25),  "🇦🇷 Revolución de Mayo"),
-    ((5, 28),  "🍔 Día de la Hamburguesa"),
-    ((6,  1),  "💰 Aguinaldo Junio"),
-    ((6, 20),  "🇦🇷 Día de la Bandera"),
-    ((6, 21),  "❄️ Inicio del Invierno"),
-    ((7,  9),  "🇦🇷 Día de la Independencia"),
-    ((7, 14),  "🏖 Vacaciones de Invierno"),
-    ((7, 20),  "🤝 Día del Amigo"),
-    ((8, 17),  "🏅 Día de San Martín"),
-    ((9, 21),  "🌸 Primavera / Día del Estudiante"),
-    ((10,11),  "🍮 Día del Dulce de Leche"),
-    ((10,31),  "🎃 Halloween"),
-    ((11,20),  "🇦🇷 Día de la Soberanía"),
-    ((11,30),  "🧉 Día del Mate"),
-    ((12, 8),  "✨ Inmaculada Concepción"),
-    ((12,15),  "💰 Aguinaldo Diciembre"),
-    ((12,24),  "🎄 Nochebuena"),
-    ((12,25),  "🎄 Navidad"),
-    ((12,31),  "🎆 Fin de Año"),
-]
-
-_HOT_SALE = {
-    2026: date(2026, 5, 18),
-    2027: date(2027, 5, 17),
-}
-
-def fechas_proximas(days=60):
-    eventos = []
-    for year in [HOY.year, HOY.year + 1]:
-        for (m, d_), name in _FECHAS_FIJAS:
-            try: eventos.append((date(year, m, d_), name))
-            except ValueError: pass
-        # Pascuas y Carnaval
-        p = _easter(year)
-        eventos += [
-            (p,                          "✝️ Pascuas"),
-            (p - timedelta(days=7),      "✝️ Semana Santa"),
-            (p - timedelta(days=47),     "🎉 Carnaval"),
-        ]
-        # Domingos variables
-        for month, n, name in [
-            (6,  3, "👨 Día del Padre"),
-            (8,  3, "🧒 Día de las Infancias"),
-            (10, 3, "👩 Día de la Madre"),
-        ]:
-            d_ = _nth_weekday(year, month, n, 6)
-            if d_: eventos.append((d_, name))
-        # CyberMonday: primer lunes de noviembre
-        cyber = _nth_weekday(year, 11, 1, 0)
-        if cyber: eventos.append((cyber, "💻 CyberMonday"))
-        # Black Friday: cuarto viernes de noviembre
-        bf = _nth_weekday(year, 11, 4, 4)
-        if bf: eventos.append((bf, "🖤 Black Friday"))
-    # Hot Sale (fecha fija por año)
-    for hs in _HOT_SALE.values():
-        eventos.append((hs, "🔥 Hot Sale"))
-    return sorted(
-        [(d_, n) for d_, n in eventos if 0 < (d_ - HOY).days <= days],
-        key=lambda x: x[0]
-    )[:5]
-
 META_FIELDS = ['campaign_name','ad_name','spend','impressions','clicks','reach',
                'frequency','actions_offsite_conversion_fb_pixel_purchase',
                'action_values_offsite_conversion_fb_pixel_purchase',
@@ -564,31 +450,10 @@ def fmt_k(n):
     if n >= 1_000:     return f"${n/1_000:.0f}K"
     return f"${n:,.0f}"
 
-# Productos más vendidos
 prods_txt = "\n".join(
     f"  • {n[:38]} ({q} ud{'s' if q > 1 else ''})"
     for n, q in top_prods_ayer
 ) or "  Sin datos"
-
-# Stock crítico
-print('Consultando stock...')
-try:
-    stock_crit = get_stock(umbral=3)
-except Exception as _e:
-    print(f"Stock error: {_e}")
-    stock_crit = []
-
-stock_txt = (
-    "\n".join(f"  🔴 {n[:35]}: {q} ud{'s' if q > 1 else ''}" for n, q in stock_crit[:6])
-    if stock_crit else "  ✅ Sin alertas"
-)
-
-# Fechas de marketing
-fechas = fechas_proximas()
-fechas_txt = "\n".join(
-    f"  {d_.strftime('%d/%m')} — {n} ({(d_ - HOY).days}d)"
-    for d_, n in fechas
-) or "  Sin fechas próximas"
 
 roas_emoji = "✅" if ayer_roas_real >= 8 else ("⚠️" if ayer_roas_real >= 5 else "🔴")
 roas_label = "Sobre objetivo" if ayer_roas_real >= 8 else ("Bajo objetivo" if ayer_roas_real >= 5 else "Crítico")
@@ -605,12 +470,6 @@ tg_msg = f"""📊 *VCP Dashboard — {AYER.strftime('%d/%m/%Y')}*
 
 🛍 *Más vendidos ayer:*
 {prods_txt}
-
-📦 *Stock crítico (≤3 uds):*
-{stock_txt}
-
-📅 *Fechas clave:*
-{fechas_txt}
 
 🔗 [Ver dashboard]({PAGES_URL})"""
 
