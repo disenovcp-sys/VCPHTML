@@ -25,23 +25,23 @@ def get_abandoned_carts():
     while True:
         after = f', after: "{cursor}"' if cursor else ""
         query = f"""{{
-          abandonedCheckouts(first: 250{after}, query: "created_at:>='{DESDE}T00:00:00-03:00' created_at:<='{HOY}T23:59:59-03:00'") {{
+          abandonedCheckouts(first: 250{after}) {{
             pageInfo {{ hasNextPage endCursor }}
             edges {{
-              node {{ email createdAt completedAt }}
+              node {{ id email abandonedCheckoutUrl createdAt }}
             }}
           }}
         }}"""
         r = requests.post(url, headers=hdrs, json={"query": query}, timeout=30)
         r.raise_for_status()
         raw = r.json()
-        print(f"API response: {raw}")
         if raw.get("errors"):
-            print(f"GraphQL errors: {raw['errors']}")
+            raise Exception(raw["errors"])
         result = raw.get("data", {}).get("abandonedCheckouts", {})
         for edge in result.get("edges", []):
             node = edge.get("node", {})
-            if not node.get("completedAt") and node.get("email"):
+            created = node.get("createdAt", "")[:10]
+            if node.get("email") and str(DESDE) <= created <= str(HOY):
                 emails.append(node["email"].lower().strip())
         page_info = result.get("pageInfo", {})
         if not page_info.get("hasNextPage"):
