@@ -24,7 +24,7 @@ jobs:
           GOOGLE_ACCOUNT:  ${{ secrets.GOOGLE_ACCOUNT }}
           TELEGRAM_BOT:    ${{ secrets.TELEGRAM_BOT }}
           TELEGRAM_CHAT:   ${{ secrets.TELEGRAM_CHAT }}
-          PAGES_URL:       https://disenovcp-sys.github.io/vcp-dashboard
+          PAGES_URL:       https://disenovcp-sys.github.io/VCPHTML
         run: python generate.py
       - name: Commit index.html
         run: |
