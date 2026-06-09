@@ -15,26 +15,35 @@ BOT           = os.environ['TELEGRAM_BOT']
 CHAT          = os.environ['TELEGRAM_CHAT']
 
 def get_abandoned_carts():
-    url  = f"https://{SHOPIFY_STORE}/admin/api/2026-04/checkouts.json"
-    hdrs = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
-    prms = {
-        "created_at_min": f"{DESDE}T00:00:00-03:00",
-        "created_at_max": f"{HOY}T23:59:59-03:00",
-        "limit": 250,
+    url  = f"https://{SHOPIFY_STORE}/admin/api/2026-04/graphql.json"
+    hdrs = {
+        "X-Shopify-Access-Token": SHOPIFY_TOKEN,
+        "Content-Type": "application/json",
     }
-    carts = []
-    while url:
-        r = requests.get(url, headers=hdrs, params=prms, timeout=30)
+    emails = []
+    cursor = None
+    while True:
+        after = f', after: "{cursor}"' if cursor else ""
+        query = f"""{{
+          abandonedCheckouts(first: 250{after}, query: "created_at:>='{DESDE}T00:00:00-03:00' created_at:<='{HOY}T23:59:59-03:00'") {{
+            pageInfo {{ hasNextPage endCursor }}
+            edges {{
+              node {{ email createdAt completedAt }}
+            }}
+          }}
+        }}"""
+        r = requests.post(url, headers=hdrs, json={"query": query}, timeout=30)
         r.raise_for_status()
-        for c in r.json().get("checkouts", []):
-            if not c.get("completed_at") and c.get("email"):
-                carts.append(c["email"].lower().strip())
-        lnk = r.headers.get("Link", "")
-        url, prms = None, None
-        for part in lnk.split(","):
-            if 'rel="next"' in part:
-                url = part.split(";")[0].strip().strip("<>")
-    return sorted(set(carts))
+        result = r.json().get("data", {}).get("abandonedCheckouts", {})
+        for edge in result.get("edges", []):
+            node = edge.get("node", {})
+            if not node.get("completedAt") and node.get("email"):
+                emails.append(node["email"].lower().strip())
+        page_info = result.get("pageInfo", {})
+        if not page_info.get("hasNextPage"):
+            break
+        cursor = page_info.get("endCursor")
+    return sorted(set(emails))
 
 print("Consultando carritos abandonados...")
 try:
