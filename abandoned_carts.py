@@ -35,6 +35,7 @@ def get_abandoned_carts():
         r = requests.post(url, headers=hdrs, json={"query": query}, timeout=30)
         r.raise_for_status()
         raw = r.json()
+        print(f"API response: {raw}")
         if raw.get("errors"):
             print(f"GraphQL errors: {raw['errors']}")
         result = raw.get("data", {}).get("abandonedCheckouts", {})
