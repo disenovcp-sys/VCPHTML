@@ -4,6 +4,7 @@ Stock crítico Shopify + fechas de marketing próximas (20 días).
 """
 import os, requests
 from datetime import datetime, timedelta, timezone, date
+from collections import defaultdict
 
 BA    = timezone(timedelta(hours=-3))
 HOY   = datetime.now(BA).date()
@@ -14,28 +15,58 @@ BOT           = os.environ['TELEGRAM_BOT']
 CHAT          = os.environ['TELEGRAM_CHAT']
 
 # ─── Shopify stock ────────────────────────────────────────────────────────────
-def get_stock(umbral=3):
+def get_stock(max_talles=2):
+    """Alerta productos donde solo quedan ≤ max_talles de su curva con stock."""
     url  = f"https://{SHOPIFY_STORE}/admin/api/2026-04/products.json"
     hdrs = {"X-Shopify-Access-Token": SHOPIFY_TOKEN}
-    prms = {"limit": 250, "fields": "id,title,variants,status"}
-    critico = []
+    prms = {"limit": 250, "fields": "id,title,variants,status,options"}
+    alertas = []
     while url:
         r = requests.get(url, headers=hdrs, params=prms, timeout=30)
         r.raise_for_status()
         for p in r.json().get("products", []):
             if p.get("status") != "active": continue
-            for v in p.get("variants", []):
-                qty  = int(v.get("inventory_quantity") or 0)
-                sku  = v.get("title", "")
-                name = f"{p['title']} / {sku}" if sku and sku != "Default Title" else p["title"]
-                if qty <= umbral:
-                    critico.append((name, qty))
+            variants = p.get("variants", [])
+            options  = p.get("options", [])
+
+            if len(options) >= 2:
+                # Producto con color + talle → agrupar por color
+                por_color = defaultdict(lambda: {"total": 0, "disponibles": 0, "talles": []})
+                for v in variants:
+                    color = v.get("option1", "") or ""
+                    talle = v.get("option2", "") or ""
+                    qty   = int(v.get("inventory_quantity") or 0)
+                    por_color[color]["total"] += 1
+                    if qty > 0:
+                        por_color[color]["disponibles"] += 1
+                        por_color[color]["talles"].append(talle)
+                for color, d in por_color.items():
+                    if d["total"] > max_talles and d["disponibles"] <= max_talles:
+                        nombre = f"{p['title']} / {color}" if color else p["title"]
+                        alertas.append({
+                            "nombre": nombre,
+                            "disponibles": d["disponibles"],
+                            "total": d["total"],
+                            "talles": d["talles"],
+                        })
+            else:
+                # Solo talles (sin color separado)
+                total = len(variants)
+                disp  = [v for v in variants if int(v.get("inventory_quantity") or 0) > 0]
+                if total > max_talles and len(disp) <= max_talles:
+                    alertas.append({
+                        "nombre": p["title"],
+                        "disponibles": len(disp),
+                        "total": total,
+                        "talles": [v.get("option1", "") for v in disp],
+                    })
+
         lnk = r.headers.get("Link", "")
         url, prms = None, None
         for part in lnk.split(","):
             if 'rel="next"' in part:
                 url = part.split(";")[0].strip().strip("<>")
-    return sorted(critico, key=lambda x: x[1])
+    return sorted(alertas, key=lambda x: x["disponibles"])
 
 # ─── Calendario de marketing ──────────────────────────────────────────────────
 def _easter(year):
@@ -127,7 +158,7 @@ def fechas_proximas(days=20):
 # ─── Ejecutar ─────────────────────────────────────────────────────────────────
 print("Consultando stock...")
 try:
-    stock_crit = get_stock(umbral=3)
+    stock_crit = get_stock(max_talles=2)
 except Exception as e:
     print(f"Error stock: {e}")
     stock_crit = []
@@ -137,11 +168,11 @@ fechas = fechas_proximas(days=20)
 # Stock
 if stock_crit:
     stock_txt = "\n".join(
-        f"  {'🔴' if q == 0 else '⚠️'} {n[:42]}: {q} ud{'s' if q != 1 else ''}"
-        for n, q in stock_crit[:10]
+        f"  ⚠️ {a['nombre'][:38]} — {a['disponibles']}/{a['total']} talles ({', '.join(a['talles'])})"
+        for a in stock_crit[:10]
     )
 else:
-    stock_txt = "  ✅ Sin productos críticos esta semana"
+    stock_txt = "  ✅ Sin productos con curva crítica"
 
 # Fechas
 if fechas:
