@@ -76,14 +76,19 @@ META_FIELDS = ['campaign_name','ad_name','spend','impressions','clicks','reach',
                'actions_add_to_cart','actions_initiate_checkout']
 
 print('Pulling Meta ayer...')
-meta_hoy = w('facebook', META, META_FIELDS, AYER, AYER)
+try:    meta_hoy = w('facebook', META, META_FIELDS, AYER, AYER)
+except Exception as e: print(f'⚠️ Meta ayer: {e}'); meta_hoy = []
 print('Pulling Meta mes...')
-meta_mes = w('facebook', META, META_FIELDS, MES_DESDE, MES_HASTA)
+try:    meta_mes = w('facebook', META, META_FIELDS, MES_DESDE, MES_HASTA)
+except Exception as e: print(f'⚠️ Meta mes: {e}'); meta_mes = []
 print('Pulling Google mes...')
-goog_mes = w('google_ads', GOOG, ['spend'], MES_DESDE, MES_HASTA)
+try:    goog_mes = w('google_ads', GOOG, ['spend'], MES_DESDE, MES_HASTA)
+except Exception as e: print(f'⚠️ Google: {e}'); goog_mes = []
 print('Pulling Shopify mes y ayer...')
-orders_mes  = shopify_orders(MES_DESDE, MES_HASTA)
-orders_ayer = shopify_orders(AYER, AYER, fields="id,total_price,financial_status,line_items")
+try:    orders_mes = shopify_orders(MES_DESDE, MES_HASTA)
+except Exception as e: print(f'⚠️ Shopify mes: {e}'); orders_mes = []
+try:    orders_ayer = shopify_orders(AYER, AYER, fields="id,total_price,financial_status,line_items")
+except Exception as e: print(f'⚠️ Shopify ayer: {e}'); orders_ayer = []
 
 def agg(rows):
     ads = defaultdict(lambda: {'camp':'','spend':0.,'imp':0,'clicks':0,'reach':0,
