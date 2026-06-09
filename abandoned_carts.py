@@ -34,7 +34,10 @@ def get_abandoned_carts():
         }}"""
         r = requests.post(url, headers=hdrs, json={"query": query}, timeout=30)
         r.raise_for_status()
-        result = r.json().get("data", {}).get("abandonedCheckouts", {})
+        raw = r.json()
+        if raw.get("errors"):
+            print(f"GraphQL errors: {raw['errors']}")
+        result = raw.get("data", {}).get("abandonedCheckouts", {})
         for edge in result.get("edges", []):
             node = edge.get("node", {})
             if not node.get("completedAt") and node.get("email"):
