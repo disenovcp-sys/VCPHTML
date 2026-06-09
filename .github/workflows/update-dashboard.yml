@@ -1,8 +1,6 @@
 name: VCP Update Dashboard
 
 on:
-  schedule:
-    - cron: '0 13 * * *'   # 10:00 BA
   workflow_dispatch:
 
 jobs:

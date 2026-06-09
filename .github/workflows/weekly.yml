@@ -1,8 +1,6 @@
 name: VCP Weekly Summary
 
 on:
-  schedule:
-    - cron: '0 13 * * 1'   # Lunes 10:00 BA (UTC-3)
   workflow_dispatch:
 
 jobs:

@@ -1,8 +1,6 @@
 name: VCP Monday Report
 
 on:
-  schedule:
-    - cron: '0 12 * * 1'   # Lunes 9:00 BA (UTC-3)
   workflow_dispatch:
 
 jobs:
