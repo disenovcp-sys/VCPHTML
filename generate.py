@@ -141,7 +141,7 @@ for _o in orders_ayer:
         _qty = int(_item.get("quantity", 0) or 0)
         _k   = f"{_t} / {_var}" if _var and _var != "Default Title" else _t
         if _t: prod_cnt[_k] += _qty
-top_prods_ayer = prod_cnt.most_common(5)
+top_prods_ayer = prod_cnt.most_common()
 mes_inv  = mes_meta + mes_goog
 mes_roas = mes_shop_rev / mes_inv if mes_inv else 0
 
