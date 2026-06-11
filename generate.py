@@ -463,6 +463,36 @@ prods_txt = "\n".join(
 roas_emoji = "✅" if ayer_roas_real >= 8 else ("⚠️" if ayer_roas_real >= 5 else "🔴")
 roas_label = "Sobre objetivo" if ayer_roas_real >= 8 else ("Bajo objetivo" if ayer_roas_real >= 5 else "Crítico")
 
+# ─── Análisis breve ───────────────────────────────────────────
+analisis = []
+if mes_roas > 0:
+    diff_roas = ayer_roas_real - mes_roas
+    if diff_roas >= 2:
+        analisis.append(f"📈 ROAS {ayer_roas_real:.1f}x vs {mes_roas:.1f}x del mes — día fuerte")
+    elif diff_roas <= -2:
+        analisis.append(f"📉 ROAS {ayer_roas_real:.1f}x por debajo del mes ({mes_roas:.1f}x)")
+    else:
+        analisis.append(f"➡️ ROAS en línea con el mes ({mes_roas:.1f}x)")
+
+mes_ticket = mes_shop_rev / mes_shop_orders if mes_shop_orders else 0
+if mes_ticket > 0 and ayer_ticket > 0:
+    diff_ticket = (ayer_ticket - mes_ticket) / mes_ticket * 100
+    if diff_ticket >= 15:
+        analisis.append(f"🎫 Ticket {fmt_k(ayer_ticket)} (+{diff_ticket:.0f}% vs promedio mensual)")
+    elif diff_ticket <= -15:
+        analisis.append(f"🎫 Ticket {fmt_k(ayer_ticket)} ({diff_ticket:.0f}% vs promedio mensual)")
+
+dias_tr = max((AYER - MES_DESDE).days + 1, 1)
+prom_ord = mes_shop_orders / dias_tr
+if ayer_shop_orders > 0 and prom_ord > 0:
+    diff_ord = (ayer_shop_orders - prom_ord) / prom_ord * 100
+    if diff_ord >= 30:
+        analisis.append(f"📦 {ayer_shop_orders} órdenes (+{diff_ord:.0f}% vs promedio diario)")
+    elif diff_ord <= -30:
+        analisis.append(f"📦 {ayer_shop_orders} órdenes ({diff_ord:.0f}% vs promedio diario)")
+
+analisis_txt = "\n".join(f"  • {a}" for a in analisis) if analisis else "  • Sin señales destacadas"
+
 tg_msg = f"""📊 *VCP Dashboard — {AYER.strftime('%d/%m/%Y')}*
 
 💰 Inversión Meta: {fmt_k(hoy_meta)}
@@ -472,6 +502,9 @@ tg_msg = f"""📊 *VCP Dashboard — {AYER.strftime('%d/%m/%Y')}*
 
 📈 *{mes_label} acumulado:*
 • Inv: {fmt_k(mes_inv)} · Rev: {fmt_k(mes_shop_rev)} · ROAS: {mes_roas:.1f}x
+
+🧠 *Análisis:*
+{analisis_txt}
 
 🛍 *Más vendidos ayer:*
 {prods_txt}
