@@ -30,6 +30,6 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add index.html
+          git add index.html sales_data.json
           git diff --staged --quiet || git commit -m "dashboard $(date -u +%Y-%m-%d)"
           git push

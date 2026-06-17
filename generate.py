@@ -1,4 +1,4 @@
-import os, requests, time, html as H
+import os, requests, time, html as H, json
 from datetime import timezone, timedelta, datetime, date
 from collections import defaultdict, Counter
 import calendar
@@ -449,6 +449,33 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 with open('index.html', 'w', encoding='utf-8') as f:
     f.write(HTML)
 print('index.html generado OK')
+
+# ─── Sales data JSON ─────────────────────────────────────────────────────────
+print('Generando sales_data.json...')
+try:
+    TREINTA = HOY - timedelta(days=30)
+    orders_30 = shopify_orders(TREINTA, AYER, fields="id,financial_status,line_items")
+    sales_counter = Counter()
+    for order in orders_30:
+        for item in order.get('line_items', []):
+            title = (item.get('title') or '').strip().upper()
+            qty = int(item.get('quantity') or 0)
+            if title and qty > 0:
+                sales_counter[title] += qty
+    sales_json = {
+        "generated": HOY.isoformat(),
+        "date_from": TREINTA.isoformat(),
+        "date_to": AYER.isoformat(),
+        "products": [
+            {"name": name, "units": units}
+            for name, units in sorted(sales_counter.items(), key=lambda x: -x[1])
+        ]
+    }
+    with open('sales_data.json', 'w', encoding='utf-8') as f:
+        json.dump(sales_json, f, ensure_ascii=False)
+    print(f'sales_data.json OK ({len(sales_json["products"])} productos)')
+except Exception as e:
+    print(f'⚠️ sales_data.json: {e}')
 
 # ─── Telegram ────────────────────────────────────────────────────────────────
 def fmt_k(n):
