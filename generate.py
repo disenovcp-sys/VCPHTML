@@ -299,7 +299,7 @@ HTML = '''<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Dashboard VCP · ''' + fecha_hoy + '''</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230a0a0f'/><text x='16' y='23' text-anchor='middle' fill='%23a78bfa' font-family='serif' font-size='20' font-weight='bold'>V</text></svg>">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='28' font-size='28'>📊</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{--bg:#0a0a0f;--surface:#111118;--border:rgba(255,255,255,0.07);--purple:#a78bfa;--blue:#8ab4f8;--green:#6ee7b7;--yellow:#fcd34d;--text:#e8e8f0;--muted:#6b6b80;--red:#f87171;}
