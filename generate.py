@@ -68,7 +68,7 @@ def shopify_orders(date_min, date_max, fields="id,total_price,financial_status")
         for part in lnk.split(","):
             if 'rel="next"' in part:
                 url = part.split(";")[0].strip().strip("<>")
-    return [o for o in out if o.get("financial_status") in ("paid", "pending", "partially_paid")]
+    return [o for o in out if o.get("financial_status") in ("paid", "pending", "partially_paid", "partially_refunded")]
 
 META_FIELDS = ['campaign_name','ad_name','spend','impressions','clicks','reach',
                'frequency','actions_offsite_conversion_fb_pixel_purchase',
